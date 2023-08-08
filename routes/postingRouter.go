@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(incomingRoutes *gin.Engine) {
+func PostingRoutes(incomingRoutes *gin.Engine) {
 	incomingRoutes.Use(middleware.Authenticate()) // Use middleware to secure routes via authentication
-	incomingRoutes.GET("/users", controller.GetUsers())
-	incomingRoutes.GET("users/:user_id", controller.GetUser())
+	incomingRoutes.GET("/posts", controller.GetJobPosts())
+	incomingRoutes.GET("posts/:post_id", controller.GetJobPost())
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID        uint      `gorm:"primaryKey;autoIncrement"`
+	UserID    int       `json:"user_id" gorm:"primaryKey;autoIncrement"`
 	FirstName *string   `json:"first_name" validate:"required,min=2,max=100"`
 	LastName  *string   `json:"last_name" validate:"required,min=2,max=100"`
 	Password  *string   `json:"password" validate:"required,min=6,max=100"`
@@ -14,5 +14,4 @@ type User struct {
 	UserType  *string   `json:"user_type" validate:"required,eq=ADMIN|eq=USER"` // Can be an Admin or User
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	UID       string    `json:"user_id"`
 }

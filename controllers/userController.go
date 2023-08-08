@@ -13,7 +13,6 @@ import (
 	"github.com/davisshriver/job-board-backend-project/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -22,7 +21,7 @@ var db = database.GetDB()
 var validate = validator.New()
 
 type loginResponse struct {
-	UserId string `json:"user_id"`
+	UserId int    `json:"user_id"`
 	Token  string `json:"token"`
 }
 
@@ -75,12 +74,8 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		// Generate tokens
-		userId := generateUniqueUserId()
-
 		user.CreatedAt = time.Now()
 		user.UpdatedAt = time.Now()
-		user.UID = userId
 
 		// Hash the password
 		password := HashPassword(*user.Password)
@@ -130,20 +125,21 @@ func Login() gin.HandlerFunc {
 		}
 
 		// Upsert the user tokens in the user_tokens table
-		err = db.FirstOrCreate(&models.UserToken{
-			UserId: foundUser.UID,
-		}, models.UserToken{
-			Token:        token,
-			RefreshToken: refreshToken,
-			UpdatedAt:    time.Now(),
-		}).Error
+		err = db.Where(models.UserToken{UserID: foundUser.UserID}).
+			Assign(models.UserToken{
+				Token:        token,
+				RefreshToken: refreshToken,
+				UpdatedAt:    time.Now(),
+			}).
+			FirstOrCreate(&models.UserToken{}).
+			Error
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while upserting tokens!"})
 			return
 		}
 
 		loginResp := loginResponse{
-			UserId: foundUser.UID,
+			UserId: foundUser.UserID,
 			Token:  token,
 		}
 
@@ -183,16 +179,16 @@ func GetUsers() gin.HandlerFunc {
 
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Param("user_id") // c allows you to access parameters from Postman
+		userId := c.Param("post_id") // c allows you to access parameters from Postman
 
 		err := helper.MatchUserTypeToUid(c, userId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
+		
 		var user models.User
-		err = db.Where("id = ?", userId).First(&user).Error
+		err = db.Where("user_id = ?", userId).First(&user).Error
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -200,10 +196,4 @@ func GetUser() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, user)
 	}
-}
-
-func generateUniqueUserId() string {
-	// Generate a new UUID (version 4) and return it as a string
-	// This will produce a unique identifier for each user.
-	return uuid.New().String()
 }

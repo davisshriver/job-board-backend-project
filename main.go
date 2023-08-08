@@ -26,7 +26,7 @@ func main() {
 	defer sqlDB.Close()
 
 	// Auto migrate the User model
-	err = db.AutoMigrate(&models.User{}, &models.UserToken{})
+	err = db.AutoMigrate(&models.User{}, &models.UserToken{}, &models.JobPost{})
 	if err != nil {
 		log.Fatal("failed to automigrate models")
 	}
@@ -36,6 +36,7 @@ func main() {
 
 	routes.AuthRoutes(router)
 	routes.UserRoutes(router)
+	routes.PostingRoutes(router)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{"success": "Access granted for api-1"})
