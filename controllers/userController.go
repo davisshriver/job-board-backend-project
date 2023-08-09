@@ -179,14 +179,14 @@ func GetUsers() gin.HandlerFunc {
 
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Param("post_id") // c allows you to access parameters from Postman
+		userId := c.Param("user_id") // c allows you to access parameters from Postman
 
 		err := helper.MatchUserTypeToUid(c, userId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		var user models.User
 		err = db.Where("user_id = ?", userId).First(&user).Error
 		if err != nil {
