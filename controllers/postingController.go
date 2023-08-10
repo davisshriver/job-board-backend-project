@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	helper "github.com/davisshriver/job-board-backend-project/helpers"
@@ -136,7 +137,7 @@ func UpdateJobPost() gin.HandlerFunc {
 			updateFields["wage"] = *updatedPost.Wage
 		}
 		if updatedPost.Expires_At != nil {
-			updateFields["expires_At"] = *updatedPost.Expires_At
+			updateFields["expires_at"] = *updatedPost.Expires_At
 		}
 
 		// Don't perform update if there are no fields to update
@@ -158,14 +159,13 @@ func UpdateJobPost() gin.HandlerFunc {
 
 func DeleteJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		err := helper.CheckUserType(c, "ADMIN")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		postIdStr := c.Param("post_id") // c allows you to access parameters from Postman
+		postIdStr := c.Param("post_id")
 		postId, err := strconv.Atoi(postIdStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -174,19 +174,22 @@ func DeleteJobPost() gin.HandlerFunc {
 
 		var post models.JobPost
 
-		// Check if a post with that Id exists
-		err = db.Where("post_id = ?", postId).First(&post).Error
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// Attempt to retrieve the post with the given ID
+		if err := db.Where("post_id = ?", postId).First(&post).Error; err != nil {
+			if strings.Contains(err.Error(), "record not found") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			}
 			return
 		}
 
-		err = db.Delete(&post).Error
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		// Delete the post
+		if err := db.Delete(&post).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete post"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"Success": "Entry deleted from database!"})
+		c.JSON(http.StatusOK, gin.H{"success": "Post deleted from the database"})
 	}
 }

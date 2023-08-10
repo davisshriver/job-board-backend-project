@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/davisshriver/job-board-backend-project/database"
@@ -195,5 +196,113 @@ func GetUser() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, user)
+	}
+}
+
+func UpdateUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var existingUser models.User
+
+		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		userIDStr := c.Param("user_id")
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = db.Where("user_id = ?", userID).First(&existingUser).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		var updatedUser models.UserUpdate
+		err = c.BindJSON(&updatedUser)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Update only the non-null fields of the existing user with the updated values
+		updateFields := map[string]interface{}{}
+
+		if updatedUser.FirstName != nil {
+			updateFields["first_name"] = *updatedUser.FirstName
+		}
+		if updatedUser.LastName != nil {
+			updateFields["last_name"] = *updatedUser.LastName
+		}
+		if updatedUser.Password != nil {
+			updateFields["password"] = *updatedUser.Password
+		}
+		if updatedUser.Email != nil {
+			updateFields["email"] = *updatedUser.Email
+		}
+		if updatedUser.Phone != nil {
+			updateFields["phone"] = *updatedUser.Phone
+		}
+		if updatedUser.UserType != nil {
+			updateFields["user_type"] = *updatedUser.UserType
+		}
+
+		updateFields["updated_at"] = time.Now()
+
+		// Don't perform update if there are no fields to update
+		if len(updateFields) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "No fields to update"})
+			return
+		}
+
+		err = db.Model(&existingUser).Updates(updateFields).Error
+		if err != nil {
+			msg := fmt.Sprintf("User profile was not updated properly!")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+
+		c.JSON(http.StatusOK, existingUser)
+	}
+}
+
+func DeleteUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		err := helper.CheckUserType(c, "ADMIN")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		userIdStr := c.Param("user_id")
+		userId, err := strconv.Atoi(userIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		var user models.User
+
+		// Attempt to retrieve the user with the given ID
+		if err := db.Where("user_id = ?", userId).First(&user).Error; err != nil {
+			if strings.Contains(err.Error(), "record not found") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			}
+			return
+		}
+
+		// Delete the post
+		if err := db.Delete(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"success": "User deleted from the database"})
 	}
 }
