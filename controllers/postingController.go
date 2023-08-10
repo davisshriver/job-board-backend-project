@@ -55,7 +55,7 @@ func GetJobPost() gin.HandlerFunc {
 	}
 }
 
-func PostJob() gin.HandlerFunc {
+func CreateJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var post models.JobPost
 
@@ -90,7 +90,73 @@ func PostJob() gin.HandlerFunc {
 	}
 }
 
-func DeleteJob() gin.HandlerFunc {
+func UpdateJobPost() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var existingPost models.JobPost
+
+		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		postIdStr := c.Param("post_id")
+		postId, err := strconv.Atoi(postIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = db.Where("post_id = ?", postId).First(&existingPost).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		var updatedPost models.JobPostUpdate
+		err = c.BindJSON(&updatedPost)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Update only the non-null fields of the existing post with the updated values
+		updateFields := map[string]interface{}{}
+
+		if updatedPost.Role != nil {
+			updateFields["role"] = *updatedPost.Role
+		}
+		if updatedPost.Description != nil {
+			updateFields["description"] = *updatedPost.Description
+		}
+		if updatedPost.Requirements != nil {
+			updateFields["requirements"] = *updatedPost.Requirements
+		}
+		if updatedPost.Wage != nil {
+			updateFields["wage"] = *updatedPost.Wage
+		}
+		if updatedPost.Expires_At != nil {
+			updateFields["expires_At"] = *updatedPost.Expires_At
+		}
+
+		// Don't perform update if there are no fields to update
+		if len(updateFields) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "No fields to update"})
+			return
+		}
+
+		err = db.Model(&existingPost).Updates(updateFields).Error
+		if err != nil {
+			msg := fmt.Sprintf("Job post was not updated properly!")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+
+		c.JSON(http.StatusOK, existingPost)
+	}
+}
+
+func DeleteJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
