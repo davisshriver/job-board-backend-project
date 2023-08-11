@@ -4,6 +4,8 @@ import "time"
 
 type Application struct {
 	ApplicationID int              `gorm:"primaryKey;autoIncrement"`
+	UserID        int              `json:"user_id"`
+    PostID        int              `json:"post_id"`
 	FirstName     string           `json:"first_name" validate:"required,min=2,max=100"`
 	LastName      string           `json:"first_name" validate:"requiredmin=2,max=100"`
 	Email         string           `json:"email" validate:"email,required"`
@@ -16,9 +18,9 @@ type Application struct {
 	ResumeURL     string           `json:"resume_url" validate:"required"`
 	LinkedInURL   string           `json:"linkedin_url"`
 	PortfolioURL  string           `json:"portfolio_url"`
-	References    []string         `json:"references"`
-	DesiredSalary float64          `json:"desired_salary"`
-	Availability  string           `json:"availability"`
+	References    []string         `json:"references"`  
+	DesiredSalary float64          `json:"desired_salary" validate:"required"`  
+	Availability  string           `json:"availability" validate:"required"`
 	Education     []EducationInfo  `json:"education"`
 	WorkHistory   []WorkExperience `json:"work_history"`
 	CreatedAt     time.Time        `json:"created_at"`

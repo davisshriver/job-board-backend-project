@@ -38,7 +38,7 @@ func GetJobPosts() gin.HandlerFunc {
 
 func GetJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		postIdStr := c.Param("post_id") // c allows you to access parameters from Postman
+		postIdStr := c.Param("post_id") 
 		postId, err := strconv.Atoi(postIdStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -60,7 +60,7 @@ func CreateJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var post models.JobPost
 
-		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		err := helper.CheckUserType(c, "ADMIN") 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -95,7 +95,7 @@ func UpdateJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var existingPost models.JobPost
 
-		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		err := helper.CheckUserType(c, "ADMIN")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -184,7 +184,6 @@ func DeleteJobPost() gin.HandlerFunc {
 			return
 		}
 
-		// Delete the post
 		if err := db.Delete(&post).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete post"})
 			return

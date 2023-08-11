@@ -82,7 +82,6 @@ func SignUp() gin.HandlerFunc {
 		password := HashPassword(*user.Password)
 		user.Password = &password
 
-		// Create the user in the database using GORM
 		err = db.Create(&user).Error
 		if err != nil {
 			msg := fmt.Sprintf("User item was not created properly!")
@@ -150,7 +149,7 @@ func Login() gin.HandlerFunc {
 
 func GetUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		err := helper.CheckUserType(c, "ADMIN")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -180,7 +179,7 @@ func GetUsers() gin.HandlerFunc {
 
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Param("user_id") // c allows you to access parameters from Postman
+		userId := c.Param("user_id") 
 
 		err := helper.MatchUserTypeToUid(c, userId)
 		if err != nil {
@@ -203,7 +202,7 @@ func UpdateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var existingUser models.User
 
-		err := helper.CheckUserType(c, "ADMIN") // This can only be accessed by admins
+		err := helper.CheckUserType(c, "ADMIN") 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -297,7 +296,6 @@ func DeleteUser() gin.HandlerFunc {
 			return
 		}
 
-		// Delete the post
 		if err := db.Delete(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 			return
