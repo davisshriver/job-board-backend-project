@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
 
-	//helper "github.com/davisshriver/job-board-backend-project/helpers"
+	inputs "github.com/davisshriver/job-board-backend-project/controllers/inputs"
 	"github.com/davisshriver/job-board-backend-project/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -13,15 +14,15 @@ import (
 
 func CreateApplication() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var application models.Application
+		var application inputs.ApplicationInput
 
 		userIdStr := c.Param("user_id")
 		userId, uIdErr := strconv.Atoi(userIdStr)
-		
+
 		postIdStr := c.Param("post_id")
 		postId, postIdErr := strconv.Atoi(postIdStr)
 
-		if uIdErr != nil || postIdErr != nil{
+		if uIdErr != nil || postIdErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error converting userId or postId to integer value!"})
 			return
 		}
@@ -39,18 +40,50 @@ func CreateApplication() gin.HandlerFunc {
 			return
 		}
 
-		application.CreatedAt = time.Now()
-
-		// Associate the application with the user (set the UserID field)
-		application.UserID = userId
-		application.PostID = postId
-
-		// Create the application in the database using GORM
-		if err := db.Create(&application).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create application"})
+		educationJSON, err := json.Marshal(application.Education)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal education array"})
 			return
 		}
 
+		referralsJSON, err := json.Marshal(application.Referrals)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal referrals array"})
+			return
+		}
+
+		workHistoryJSON, err := json.Marshal(application.WorkHistory)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal work history array"})
+			return
+		}
+
+		if err := db.Create(&models.Application{
+			UserID:        userId,
+			PostID:        postId,
+			FirstName:     application.FirstName,
+			LastName:      application.LastName,
+			Email:         application.Email,
+			Phone:         application.Phone,
+			Address:       application.Address,
+			City:          application.City,
+			State:         application.State,
+			PostalCode:    application.PostalCode,
+			CoverLetter:   application.CoverLetter,
+			ResumeURL:     application.ResumeURL,
+			LinkedInURL:   application.LinkedInURL,
+			PortfolioURL:  application.PortfolioURL,
+			DesiredSalary: application.DesiredSalary,
+			Availability:  application.Availability,
+			Education:     educationJSON,
+			Referrals:     referralsJSON,
+			WorkHistory:   workHistoryJSON,
+			CreatedAt:     time.Now(),
+			UpdatedAt:     time.Now(),
+		}).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create application"})
+			return
+		}
 		c.JSON(http.StatusOK, application)
 	}
 }
