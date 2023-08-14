@@ -26,7 +26,7 @@ func main() {
 	defer sqlDB.Close()
 
 	// Auto migrate the User model
-	err = db.AutoMigrate(&models.User{}, &models.UserToken{}, &models.JobPost{})
+	err = db.AutoMigrate(&models.User{}, &models.UserToken{}, &models.JobPost{}, &models.Application{})
 	if err != nil {
 		log.Fatal("failed to automigrate models")
 	}
@@ -34,9 +34,11 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
+	// Set up routes
 	routes.AuthRoutes(router)
 	routes.UserRoutes(router)
 	routes.PostingRoutes(router)
-
+	routes.ApplicationRoutes(router)
+	
 	router.Run(":" + port)
 }
