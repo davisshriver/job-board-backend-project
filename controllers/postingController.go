@@ -7,18 +7,11 @@ import (
 	"strings"
 	"time"
 
+	inputs "github.com/davisshriver/job-board-backend-project/controllers/inputs"
 	helper "github.com/davisshriver/job-board-backend-project/helpers"
 	"github.com/davisshriver/job-board-backend-project/models"
 	"github.com/gin-gonic/gin"
 )
-
-type JobPostUpdate struct {
-	Role         *string    `json:"role" validate:"omitempty,min=2,max=100"`
-	Description  *string    `json:"description" validate:"omitempty,min=2,max=300"`
-	Requirements *string    `json:"requirements" validate:"omitempty,min=2,max=300"`
-	Wage         *int       `json:"wage" validate:"omitempty"`
-	Expires_At   *time.Time `json:"expires_at" validate:"omitempty"`
-}
 
 func GetJobPosts() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -122,7 +115,7 @@ func UpdateJobPost() gin.HandlerFunc {
 			return
 		}
 
-		var updatedPost JobPostUpdate
+		var updatedPost inputs.JobPostUpdate
 		err = c.BindJSON(&updatedPost)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

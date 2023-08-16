@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	inputs "github.com/davisshriver/job-board-backend-project/controllers/inputs"
 	outputs "github.com/davisshriver/job-board-backend-project/controllers/outputs"
 	"github.com/davisshriver/job-board-backend-project/database"
 	helper "github.com/davisshriver/job-board-backend-project/helpers"
@@ -21,16 +22,6 @@ import (
 
 var db = database.GetDB()
 var validate = validator.New()
-
-type UserUpdate struct {
-	FirstName *string    `json:"first_name" validate:"omitempty,min=2,max=100"`
-	LastName  *string    `json:"last_name" validate:"omitempty,min=2,max=100"`
-	Password  *string    `json:"password" validate:"omitempty,min=6,max=100"`
-	Email     *string    `json:"email" validate:"omitempty,email"`
-	Phone     *string    `json:"phone" validate:"omitempty,min=1,max=10"`
-	UserType  *string    `json:"user_type" validate:"omitempty,eq=ADMIN|eq=USER"`
-	UpdatedAt *time.Time `json:"updated_at" validate:"omitempty"`
-}
 
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -247,7 +238,7 @@ func UpdateUser() gin.HandlerFunc {
 			return
 		}
 
-		var updatedUser UserUpdate
+		var updatedUser inputs.UserUpdate
 		err = c.BindJSON(&updatedUser)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
