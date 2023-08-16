@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/davisshriver/job-board-backend-project/database"
+	models "github.com/davisshriver/job-board-backend-project/models"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 var db = database.GetDB()
@@ -25,10 +27,10 @@ var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
 func GenerateAllTokens(email string, firstName string, lastName string, userType string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
-		Email:      email,
-		FirstName:  firstName,
-		LastName:   lastName,
-		UserType:   userType,
+		Email:     email,
+		FirstName: firstName,
+		LastName:  lastName,
+		UserType:  userType,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
@@ -100,4 +102,22 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId strin
 		log.Panic(err)
 		return
 	}
+}
+
+func GetUserIdFromToken(c *gin.Context) int {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return 0
+	}
+
+	tokenString := authHeader
+
+	// Retrieve the userId from the database using the token
+	var userToken models.UserToken
+	err := db.Where("token = ?", tokenString).First(&userToken).Error
+	if err != nil {
+		return 0
+	}
+
+	return userToken.UserID
 }
