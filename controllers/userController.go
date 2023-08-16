@@ -21,9 +21,14 @@ import (
 var db = database.GetDB()
 var validate = validator.New()
 
-type loginResponse struct {
-	UserId int    `json:"user_id"`
-	Token  string `json:"token"`
+type UserUpdate struct {
+	FirstName *string    `json:"first_name" validate:"omitempty,min=2,max=100"`
+	LastName  *string    `json:"last_name" validate:"omitempty,min=2,max=100"`
+	Password  *string    `json:"password" validate:"omitempty,min=6,max=100"`
+	Email     *string    `json:"email" validate:"omitempty,email"`
+	Phone     *string    `json:"phone" validate:"omitempty,min=1,max=10"`
+	UserType  *string    `json:"user_type" validate:"omitempty,eq=ADMIN|eq=USER"`
+	UpdatedAt *time.Time `json:"updated_at" validate:"omitempty"`
 }
 
 func HashPassword(password string) string {
@@ -138,7 +143,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		loginResp := loginResponse{
+		loginResp := outputs.loginResponse{
 			UserId: foundUser.UserID,
 			Token:  token,
 		}
@@ -179,7 +184,7 @@ func GetUsers() gin.HandlerFunc {
 
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Param("user_id") 
+		userId := c.Param("user_id")
 
 		err := helper.MatchUserTypeToUid(c, userId)
 		if err != nil {
@@ -202,7 +207,7 @@ func UpdateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var existingUser models.User
 
-		err := helper.CheckUserType(c, "ADMIN") 
+		err := helper.CheckUserType(c, "ADMIN")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -221,7 +226,7 @@ func UpdateUser() gin.HandlerFunc {
 			return
 		}
 
-		var updatedUser models.UserUpdate
+		var updatedUser UserUpdate
 		err = c.BindJSON(&updatedUser)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
