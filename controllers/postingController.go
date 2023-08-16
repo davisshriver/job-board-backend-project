@@ -12,6 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type JobPostUpdate struct {
+	Role         *string    `json:"role" validate:"omitempty,min=2,max=100"`
+	Description  *string    `json:"description" validate:"omitempty,min=2,max=300"`
+	Requirements *string    `json:"requirements" validate:"omitempty,min=2,max=300"`
+	Wage         *int       `json:"wage" validate:"omitempty"`
+	Expires_At   *time.Time `json:"expires_at" validate:"omitempty"`
+}
+
 func GetJobPosts() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		recordPerPage, err := strconv.Atoi(c.DefaultQuery("recordPerPage", "10"))
@@ -38,7 +46,7 @@ func GetJobPosts() gin.HandlerFunc {
 
 func GetJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		postIdStr := c.Param("post_id") 
+		postIdStr := c.Param("post_id")
 		postId, err := strconv.Atoi(postIdStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -60,7 +68,7 @@ func CreateJobPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var post models.JobPost
 
-		err := helper.CheckUserType(c, "ADMIN") 
+		err := helper.CheckUserType(c, "ADMIN")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -114,7 +122,7 @@ func UpdateJobPost() gin.HandlerFunc {
 			return
 		}
 
-		var updatedPost models.JobPostUpdate
+		var updatedPost JobPostUpdate
 		err = c.BindJSON(&updatedPost)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	outputs "github.com/davisshriver/job-board-backend-project/controllers/outputs"
 	"github.com/davisshriver/job-board-backend-project/database"
 	helper "github.com/davisshriver/job-board-backend-project/helpers"
 	"github.com/davisshriver/job-board-backend-project/models"
@@ -94,7 +95,16 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, user)
+		signUpResp := outputs.SignUpResponse{
+			UserId:    user.UserID,
+			FirstName: *user.FirstName,
+			LastName:  *user.LastName,
+			Email:     *user.Email,
+			Phone:     *user.Phone,
+			UserType:  *user.UserType,
+		}
+
+		c.JSON(http.StatusOK, signUpResp)
 	}
 }
 
@@ -143,7 +153,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		loginResp := outputs.loginResponse{
+		loginResp := outputs.LoginResponse{
 			UserId: foundUser.UserID,
 			Token:  token,
 		}
@@ -199,7 +209,18 @@ func GetUser() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, user)
+		getUserResponse := outputs.UserResponse{
+			UserID:    user.UserID,
+			FirstName: *user.FirstName,
+			LastName:  *user.LastName,
+			Email:     *user.Email,
+			Phone:     *user.Phone,
+			UserType:  *user.UserType,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		}
+
+		c.JSON(http.StatusOK, getUserResponse)
 	}
 }
 
