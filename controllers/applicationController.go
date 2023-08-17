@@ -20,6 +20,10 @@ func GetApplication() gin.HandlerFunc {
 		applicationId := c.Param("application_id")
 		userId := c.Param("user_id")
 		userIdInt, err := strconv.Atoi(userId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
 		// Check if the current user matches the user from parameters
 		currentUserId := helpers.GetUserIdFromToken(c)
@@ -89,6 +93,10 @@ func GetUserApplications() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("user_id")
 		userIdInt, err := strconv.Atoi(userId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
 		// Check if the current user matches the user from parameters
 		currentUserId := helpers.GetUserIdFromToken(c)
@@ -235,6 +243,170 @@ func CreateApplication() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, application)
+	}
+}
+
+func UpdateApplication() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var existingApplication models.Application
+
+		// Grab parameters
+		userIdStr := c.Param("user_id")
+		userId, err := strconv.Atoi(userIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		applicationIdStr := c.Param("application_id")
+		applicationId, err := strconv.Atoi(applicationIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Check if the current user matches the user from parameters
+		currentUserId := helpers.GetUserIdFromToken(c)
+		if currentUserId != userId {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "You can only update your own applications"})
+			return
+		}
+
+		// Retrieve application information
+		err = db.Where("application_id = ? AND user_id = ?", applicationId, userId).First(&existingApplication).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		var updatedInput inputs.ApplicationUpdateInput
+		err = c.BindJSON(&updatedInput)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Update fields in the existingApplication model based on updatedInput
+		if updatedInput.FirstName != nil {
+			existingApplication.FirstName = *updatedInput.FirstName
+		}
+		if updatedInput.LastName != nil {
+			existingApplication.LastName = *updatedInput.LastName
+		}
+		if updatedInput.Email != nil {
+			existingApplication.Email = *updatedInput.Email
+		}
+		if updatedInput.Phone != nil {
+			existingApplication.Phone = *updatedInput.Phone
+		}
+		if updatedInput.Address != nil {
+			existingApplication.Address = *updatedInput.Address
+		}
+		if updatedInput.City != nil {
+			existingApplication.City = *updatedInput.City
+		}
+		if updatedInput.State != nil {
+			existingApplication.State = *updatedInput.State
+		}
+		if updatedInput.PostalCode != nil {
+			existingApplication.PostalCode = *updatedInput.PostalCode
+		}
+		if updatedInput.CoverLetter != nil {
+			existingApplication.CoverLetter = *updatedInput.CoverLetter
+		}
+		if updatedInput.ResumeURL != nil {
+			existingApplication.ResumeURL = *updatedInput.ResumeURL
+		}
+		if updatedInput.LinkedInURL != nil {
+			existingApplication.LinkedInURL = *updatedInput.LinkedInURL
+		}
+		if updatedInput.PortfolioURL != nil {
+			existingApplication.PortfolioURL = *updatedInput.PortfolioURL
+		}
+		if updatedInput.DesiredSalary != nil {
+			existingApplication.DesiredSalary = *updatedInput.DesiredSalary
+		}
+		if updatedInput.Availability != nil {
+			existingApplication.Availability = *updatedInput.Availability
+		}
+
+		existingApplication.UpdatedAt = time.Now()
+
+		// Marshal the fields that were originally stored as JSON
+		// Must be done this way, not compatible with reflection due to slice arrays
+		if updatedInput.Education != nil {
+			educationJSON, err := json.Marshal(updatedInput.Education)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal education array"})
+				return
+			}
+			existingApplication.Education = educationJSON
+		}
+
+		if updatedInput.Referrals != nil {
+			referralsJSON, err := json.Marshal(updatedInput.Referrals)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal referrals array"})
+				return
+			}
+			existingApplication.Referrals = referralsJSON
+		}
+
+		if updatedInput.WorkHistory != nil {
+			workHistoryJSON, err := json.Marshal(updatedInput.WorkHistory)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal work history array"})
+				return
+			}
+			existingApplication.WorkHistory = workHistoryJSON
+		}
+
+		// Perform the update
+		if err := db.Save(&existingApplication).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Create response struct
+		updatedOutput := outputs.ApplicationOutput{
+			ApplicationID: existingApplication.ApplicationID,
+			UserID:        existingApplication.UserID,
+			PostID:        existingApplication.PostID,
+			FirstName:     existingApplication.FirstName,
+			LastName:      existingApplication.LastName,
+			Email:         existingApplication.Email,
+			Phone:         existingApplication.Phone,
+			Address:       existingApplication.Address,
+			City:          existingApplication.City,
+			State:         existingApplication.State,
+			PostalCode:    existingApplication.PostalCode,
+			CoverLetter:   existingApplication.CoverLetter,
+			ResumeURL:     existingApplication.ResumeURL,
+			LinkedInURL:   existingApplication.LinkedInURL,
+			PortfolioURL:  existingApplication.PortfolioURL,
+			DesiredSalary: existingApplication.DesiredSalary,
+			Availability:  existingApplication.Availability,
+			CreatedAt:     existingApplication.CreatedAt,
+			UpdatedAt:     existingApplication.UpdatedAt,
+		}
+
+		// Unmarshal existing post's Experience, Education, and Work Hitory for output
+		if err := json.Unmarshal(existingApplication.Referrals, &updatedOutput.Referrals); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal referrals array"})
+			return
+		}
+
+		if err := json.Unmarshal(existingApplication.Education, &updatedOutput.Education); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal education array"})
+			return
+		}
+
+		if err := json.Unmarshal(existingApplication.WorkHistory, &updatedOutput.WorkHistory); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal work history array"})
+			return
+		}
+
+		c.JSON(http.StatusOK, updatedOutput)
 	}
 }
 

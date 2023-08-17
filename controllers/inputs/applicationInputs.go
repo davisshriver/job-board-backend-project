@@ -13,11 +13,31 @@ type ApplicationInput struct {
 	ResumeURL     string           `json:"resume_url" validate:"required"`
 	LinkedInURL   string           `json:"linkedin_url"`
 	PortfolioURL  string           `json:"portfolio_url"`
-	Referrals     []Referral       `json:"referrals" validate:"required"`
 	DesiredSalary float64          `json:"desired_salary" validate:"required"`
 	Availability  string           `json:"availability" validate:"required"`
 	Education     []EducationInfo  `json:"education"`
+	Referrals     []Referral       `json:"referrals" validate:"required"`
 	WorkHistory   []WorkExperience `json:"work_history"`
+}
+
+type ApplicationUpdateInput struct {
+	FirstName     *string          `json:"first_name" validate:"omitempty,min=2,max=100"`
+	LastName      *string          `json:"last_name" validate:"omitempty,min=2,max=100"`
+	Email         *string          `json:"email" validate:"omitempty,email"`
+	Phone         *string          `json:"phone" validate:"omitempty"`
+	Address       *string          `json:"address" validate:"omitempty"`
+	City          *string          `json:"city" validate:"omitempty"`
+	State         *string          `json:"state" validate:"omitempty"`
+	PostalCode    *string          `json:"postal_code" validate:"omitempty"`
+	CoverLetter   *string          `json:"cover_letter" validate:"omitempty"`
+	ResumeURL     *string          `json:"resume_url" validate:"omitempty"`
+	LinkedInURL   *string          `json:"linkedin_url" validate:"omitempty"`
+	PortfolioURL  *string          `json:"portfolio_url" validate:"omitempty"`
+	DesiredSalary *float64         `json:"desired_salary" validate:"omitempty"`
+	Availability  *string          `json:"availability" validate:"omitempty"`
+	Education     []EducationInfo  `json:"education" validate:"omitempty"`
+	Referrals     []Referral       `json:"referrals" validate:"omitempty"`
+	WorkHistory   []WorkExperience `json:"work_history" validate:"omitempty"`
 }
 
 type Referral struct {
