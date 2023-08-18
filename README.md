@@ -94,7 +94,7 @@ Get user details by ID.
 
 | Parameter | Type   | Description            |
 |-----------|--------|------------------------|
-| `user_id`      | int    | User ID           |
+| `user_id`      | string | User ID           |
 
 **Response Body Example:**
 
@@ -162,7 +162,7 @@ Edit a user's information. A user can only edit their own information, but admin
 
 | Parameter | Type   | Description            |
 |-----------|--------|------------------------|
-| `user_id`      | int    | User ID           |
+| `user_id`      | string | User ID           |
 
 ### Request Parameters
 
@@ -205,7 +205,7 @@ Deletes a user from the database.
 
 | Parameter | Type   | Description            |
 |-----------|--------|------------------------|
-| `user_id`      | int    | User ID           |
+| `user_id`      | string | User ID           |
 
 **Response Body Example:**
 
@@ -217,6 +217,80 @@ Deletes a user from the database.
 
 # Job Post Endpoints
 <a name="job-post-endpoints"></a>
+
+## Get Posts: `/posts`
+
+Get all job posts.
+
+### Access Level
+`USER`
+
+### Method
+
+`GET`
+
+**Response Body Example:**
+
+```json
+[
+    {
+        "PostID": 1,
+        "role": "Job1",
+        "description": "Cool Job",
+        "requirements": "1 Year Experience",
+        "created_by": "Admin",
+        "location": "Fort Worth, TX",
+        "wage": 12,
+        "created_at": "2023-08-18T10:00:00Z",
+        "expires_at": "2023-08-31T23:59:59Z"
+    },
+    {
+        "PostID": 2,
+        "role": "Job2",
+        "description": "Exciting Position",
+        "requirements": "Bachelor's Degree",
+        "created_by": "HR Manager",
+        "location": "New York, NY",
+        "wage": 20,
+        "created_at": "2023-08-19T09:30:00Z",
+        "expires_at": "2023-09-15T23:59:59Z"
+    }
+]
+
+```
+
+## Get Post: `/posts/:post_id`
+
+Get post by post id.
+
+### Access Level
+`USER`
+
+### Method
+
+`GET`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `post_id`      | string    | Post ID        |
+
+**Response Body Example:**
+
+```json
+ {
+        "PostID": 2,
+        "role": "Job2",
+        "description": "Exciting Position",
+        "requirements": "Bachelor's Degree",
+        "created_by": "HR Manager",
+        "location": "New York, NY",
+        "wage": 20,
+        "created_at": "2023-08-19T09:30:00Z",
+        "expires_at": "2023-09-15T23:59:59Z"
+    }
+```
 
 # Application Endpoints
 <a name="application endpoints"></a>
