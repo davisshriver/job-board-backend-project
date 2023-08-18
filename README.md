@@ -5,7 +5,9 @@ A Backend project that simulates a job board. Applicants can view jobs and apply
 This project is currently in progress and should be completed soon. Come back soon to see updates and more documentation.
 
 ## Diagram for Applicant APIs
-![Applicant Endpoints](https://github.com/davisshriver/job-board-backend-project/assets/18060803/8672ec07-1060-42cc-ae6f-9d021e751cd9)
+![Applicant Endpoints](https://github.com/davisshriver/job-board-backend-project/assets/18060803/5e0ceb55-237a-449b-8803-92302b0f55b7)
+
 
 ## Diagram for Admin APIs
-![Admin Endpoints](https://github.com/davisshriver/job-board-backend-project/assets/18060803/efb47ea2-c6b4-4949-8172-3f4356b8dde4)
+![Admin Endpoints](https://github.com/davisshriver/job-board-backend-project/assets/18060803/036f8268-cb11-4202-a772-1993791964d6)
+
