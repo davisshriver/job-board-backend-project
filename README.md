@@ -292,5 +292,44 @@ Get post by post id.
     }
 ```
 
+## Create Post: `/posts`
+
+Create a new job listing that can be applied to by users.
+
+### Access Level
+`ADMIN`
+### Method
+
+`POST`
+
+### Request Parameters
+
+| Parameter     | Type      | Description             |
+|---------------|-----------|-------------------------|
+| `role`        | string    | Role of the job         |
+| `description` | string    | Job description         |
+| `requirements`| string    | Job requirements        |
+| `created_by`  | string    | Created by              |
+| `location`    | string    | Job location            |
+| `wage`        | int       | Wage                    |
+| `expires_at`  | time.Time | Expiration timestamp    |
+
+
+**Response Body Example:**
+
+```json
+{
+    "PostID": 2,
+    "role": "Marketing Specialist",
+    "description": "Exciting opportunity in marketing field.",
+    "requirements": "Bachelor's degree in Marketing, strong communication skills.",
+    "created_by": "Marketing Director",
+    "location": "New York, NY",
+    "wage": 60000,
+    "created_at": "2023-08-19T13:39:47.5982026-05:00",
+    "expires_at": "2023-09-30T23:59:59Z"
+}
+```
+
 # Application Endpoints
 <a name="application endpoints"></a>
