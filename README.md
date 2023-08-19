@@ -5,11 +5,26 @@ A Backend project that simulates a job board. Applicants can view jobs and apply
 This project is currently in progress and should be completed soon. Come back soon to see updates and more documentation.
 
 ## Table of Contents
-
-- [User Endpoints](#user-endpoints)
-- [Job Post Endpoints](#job-post-endpoints)
-- [Application Endpoints](#application-endpoints)
-
+### [User Endpoints](#user-endpoints)
+- [Sign up](#create-user)
+- [Login](#login)
+- [Get Users](#get-users)
+- [Get User](#get-user)
+- [Edit User](#edit-user)
+- [Delete User](#delete-user)
+### [Job Post Endpoints](#job-post-endpoints)
+- [Get Posts](#get-posts)
+- [Get Post](#get-post)
+- [Create Post](#create-post)
+- [Edit User](#edit-post)
+- [Delete User](#delete-post)
+### [Application Endpoints](#application-endpoints)
+- [Get Applications](#get-applications)
+- [Get Application](#get-application)
+- [Create Application](#create-application)
+- [Edit Application](#edit-application)
+- [Delete Application](#delete-application)
+  
 ## Diagram for Applicant APIs
 ![Applicant Endpoints](https://github.com/davisshriver/job-board-backend-project/assets/18060803/5e0ceb55-237a-449b-8803-92302b0f55b7)
 
@@ -19,6 +34,7 @@ This project is currently in progress and should be completed soon. Come back so
 
 # User Endpoints
 <a name="user-endpoints"></a>
+<a name="create-user"></a>
 ## Sign Up: `/users/signup`
 
 Sign up for the job site.
@@ -52,7 +68,7 @@ Sign up for the job site.
     "user_type": "USER"
 }
 ```
-
+<a name="login"></a>
 ## Login: `/users/login`
 
 Log into the job site and receive a JWT.
@@ -79,38 +95,7 @@ Log into the job site and receive a JWT.
 }
 ```
 
-## Get User: `/users/:user_id`
-
-Get user details by ID.
-
-### Access Level
-`USER`
-
-### Method
-
-`GET`
-
-### URL Parameters
-
-| Parameter | Type   | Description            |
-|-----------|--------|------------------------|
-| `user_id`      | string | User ID           |
-
-**Response Body Example:**
-
-```json
-{
-    "user_id": 2,
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john.doe@gmail.com",
-    "phone": "9403334444",
-    "user_type": "USER",
-    "created_at": "2023-08-08T12:44:01.597775-05:00",
-    "updated_at": "2023-08-08T12:44:01.597775-05:00"
-}
-```
-
+<a name="get-users"></a>
 ## Get Users: `/users`
 
 Get all users.
@@ -148,6 +133,40 @@ Get all users.
 ]
 ```
 
+<a name="get-user"></a>
+## Get User: `/users/:user_id`
+
+Get user details by ID.
+
+### Access Level
+`USER`
+
+### Method
+
+`GET`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `user_id`      | string | User ID           |
+
+**Response Body Example:**
+
+```json
+{
+    "user_id": 2,
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@gmail.com",
+    "phone": "9403334444",
+    "user_type": "USER",
+    "created_at": "2023-08-08T12:44:01.597775-05:00",
+    "updated_at": "2023-08-08T12:44:01.597775-05:00"
+}
+```
+
+<a name="edit-user"></a>
 ## Edit User: `/users/:user_id`
 
 Edit a user's information. A user can only edit their own information, but administrators can edit any user's information.
@@ -190,6 +209,7 @@ Edit a user's information. A user can only edit their own information, but admin
 }
 ```
 
+<a name="delete-user"></a>
 ## Delete User: `/users/:user_id`
 
 Deletes a user from the database.
@@ -217,7 +237,7 @@ Deletes a user from the database.
 
 # Job Post Endpoints
 <a name="job-post-endpoints"></a>
-
+<a name="get-posts"></a>
 ## Get Posts: `/posts`
 
 Get all job posts.
@@ -259,6 +279,7 @@ Get all job posts.
 
 ```
 
+<a name="get-post"></a>
 ## Get Post: `/posts/:post_id`
 
 Get post by post id.
@@ -292,6 +313,7 @@ Get post by post id.
     }
 ```
 
+<a name="create-post"></a>
 ## Create Post: `/posts`
 
 Create a new job listing that can be applied to by users.
@@ -331,5 +353,81 @@ Create a new job listing that can be applied to by users.
 }
 ```
 
+<a name="edit-post"></a>
+## Edit Post: `/posts/:post_id`
+
+Edit a job post's details.
+
+### Access Level
+`ADMIN`
+### Method
+
+`PATCH`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `post_id`      | int | post ID              |
+
+### Request Parameters
+
+| Parameter     | Type       | Description                    |
+|---------------|------------|--------------------------------|
+| `role`        | string     | Updated role of the job        |
+| `description` | string     | Updated job description        |
+| `requirements`| string     | Updated job requirements       |
+| `wage`        | int        | Updated wage                   |
+| `expires_at`  | time.Time  | Updated expiration timestamp   |
+
+**Response Body Example:**
+
+```json
+{
+    "PostID": 2,
+    "role": "Marketing Intern",
+    "description": "Exciting entry level opportunity in marketing field.",
+    "requirements": "Currently pursuing Bachelor's degree in Marketing, strong communication skills.",
+    "created_by": "Marketing Director",
+    "location": "New York, NY",
+    "wage": 50000,
+    "created_at": "2023-08-19T13:39:47.598202-05:00",
+    "expires_at": "2023-09-30T23:59:59Z"
+}
+```
+
+<a name="delete-post"></a>
+## Delete Post: `/posts/:post_id`
+
+Deletes a post from the database.
+
+### Access Level
+`ADMIN`
+
+### Method
+
+`DELETE`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `post_id`      | int | Post ID              |
+
+**Response Body Example:**
+
+```json
+{
+    "success": "Post deleted from the database"
+}
+```
+
+
 # Application Endpoints
 <a name="application endpoints"></a>
+
+<a name="get-applications"></a>
+<a name="get-application"></a>
+<a name="create-application"></a>
+<a name="edit-application"></a>
+<a name="delete-application"></a>
