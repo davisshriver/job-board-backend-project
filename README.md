@@ -425,9 +425,226 @@ Deletes a post from the database.
 
 # Application Endpoints
 <a name="application endpoints"></a>
-
 <a name="get-applications"></a>
+## Get Applications: `/users/:user_id/applications`
+
+Get all of a specific user's applications.
+
+### Access Level
+`USER`
+
+### Method
+
+`GET`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `user_id`      | string | User ID           |
+
+
+**Response Body Example:**
+
+```json
+[
+    {
+        "application_id": 3,
+        "user_id": 1,
+        "post_id": 3,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "1234567890",
+        "address": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "cover_letter": "This is my cover letter.",
+        "resume_url": "https://example.com/resume.pdf",
+        "linkedin_url": "https://linkedin.com/in/johndoe",
+        "portfolio_url": "https://johndoe.portfolio.com",
+        "referrals": [
+            {
+                "name": "Jane Smith",
+                "phone": "9876543210",
+                "relation": "Colleague",
+                "title": "Project Manager"
+            },
+            {
+                "name": "Michael Johnson",
+                "phone": "5555555555",
+                "relation": "Supervisor",
+                "title": "Lead Developer"
+            }
+        ],
+        "desired_salary": 60000,
+        "availability": "Full-time",
+        "education": [
+            {
+                "degree": "Bachelor's Degree",
+                "school": "University of Example",
+                "location": "New York, NY",
+                "grad_year": 2020
+            }
+        ],
+        "work_history": [
+            {
+                "position": "Software Engineer",
+                "company": "Tech Innovators",
+                "location": "San Francisco, CA",
+                "start_year": 2020,
+                "end_year": 2022,
+                "responsibilities": [
+                    "Developed web applications",
+                    "Collaborated with team"
+                ]
+            }
+        ],
+        "created_at": "2023-08-20T18:47:46.774061-05:00",
+        "expires_at": "2023-08-20T18:47:46.774061-05:00"
+    },
+    {
+        "application_id": 4,
+        "user_id": 1,
+        "post_id": 3,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "1234567890",
+        "address": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "cover_letter": "This is my cover letter.",
+        "resume_url": "https://example.com/resume.pdf",
+        "linkedin_url": "https://linkedin.com/in/johndoe",
+        "portfolio_url": "https://johndoe.portfolio.com",
+        "referrals": [
+            {
+                "name": "Jane Smith",
+                "phone": "9876543210",
+                "relation": "Colleague",
+                "title": "Project Manager"
+            },
+            {
+                "name": "Michael Johnson",
+                "phone": "5555555555",
+                "relation": "Supervisor",
+                "title": "Lead Developer"
+            }
+        ],
+        "desired_salary": 60000,
+        "availability": "Full-time",
+        "education": [
+            {
+                "degree": "Bachelor's Degree",
+                "school": "University of Example",
+                "location": "New York, NY",
+                "grad_year": 2020
+            }
+        ],
+        "work_history": [
+            {
+                "position": "Data Scientist",
+                "company": "AI Innovations",
+                "location": "San Francisco, CA",
+                "start_year": 2020,
+                "end_year": 2022,
+                "responsibilities": [
+                    "Analyzed data patterns",
+                    "Developed predictive models"
+                ]
+            }
+        ],
+        "created_at": "2023-08-20T18:47:47.975755-05:00",
+        "expires_at": "2023-08-20T18:47:47.975755-05:00"
+    }
+]
+```
+
 <a name="get-application"></a>
+## Get Application: `/users/:user_id/applications/:application_id`
+
+Get a specific application by application id. User's can only get their own applications.
+
+### Access Level
+`USER`
+
+### Method
+
+`GET`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `user_id`      | string | User ID           |
+| `application_id` | string | Application ID  |
+
+
+**Response Body Example:**
+
+```json
+{
+        "application_id": 3,
+        "user_id": 1,
+        "post_id": 3,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "1234567890",
+        "address": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "cover_letter": "This is my cover letter.",
+        "resume_url": "https://example.com/resume.pdf",
+        "linkedin_url": "https://linkedin.com/in/johndoe",
+        "portfolio_url": "https://johndoe.portfolio.com",
+        "referrals": [
+            {
+                "name": "Jane Smith",
+                "phone": "9876543210",
+                "relation": "Colleague",
+                "title": "Project Manager"
+            },
+            {
+                "name": "Michael Johnson",
+                "phone": "5555555555",
+                "relation": "Supervisor",
+                "title": "Lead Developer"
+            }
+        ],
+        "desired_salary": 60000,
+        "availability": "Full-time",
+        "education": [
+            {
+                "degree": "Bachelor's Degree",
+                "school": "University of Example",
+                "location": "New York, NY",
+                "grad_year": 2020
+            }
+        ],
+        "work_history": [
+            {
+                "position": "Software Engineer",
+                "company": "Tech Innovators",
+                "location": "San Francisco, CA",
+                "start_year": 2020,
+                "end_year": 2022,
+                "responsibilities": [
+                    "Developed web applications",
+                    "Collaborated with team"
+                ]
+            }
+        ],
+        "created_at": "2023-08-20T18:47:46.774061-05:00",
+        "expires_at": "2023-08-20T18:47:46.774061-05:00"
+    }
+```
+
+
 <a name="create-application"></a>
 <a name="edit-application"></a>
 <a name="delete-application"></a>
