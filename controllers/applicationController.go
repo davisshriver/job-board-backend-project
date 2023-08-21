@@ -216,7 +216,7 @@ func CreateApplication() gin.HandlerFunc {
 			return
 		}
 
-		if err := db.Create(&models.Application{
+		applicationModel := models.Application{
 			UserID:        userId,
 			PostID:        postId,
 			FirstName:     application.FirstName,
@@ -238,11 +238,40 @@ func CreateApplication() gin.HandlerFunc {
 			WorkHistory:   workHistoryJSON,
 			CreatedAt:     time.Now(),
 			UpdatedAt:     time.Now(),
-		}).Error; err != nil {
+		}
+		
+		result := db.Create(&applicationModel)
+		if result.Error != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create application"})
 			return
 		}
-		c.JSON(http.StatusOK, application)
+		
+		output := outputs.ApplicationOutput{
+			ApplicationID: applicationModel.ApplicationID,
+			UserID:        applicationModel.UserID,
+			PostID:        applicationModel.PostID,
+			FirstName:     application.FirstName,
+			LastName:      application.LastName,
+			Email:         application.Email,
+			Phone:         application.Phone,
+			Address:       application.Address,
+			City:          application.City,
+			State:         application.State,
+			PostalCode:    application.PostalCode,
+			CoverLetter:   application.CoverLetter,
+			ResumeURL:     application.ResumeURL,
+			LinkedInURL:   application.LinkedInURL,
+			PortfolioURL:  application.PortfolioURL,
+			Referrals:     application.Referrals,
+			DesiredSalary: application.DesiredSalary,
+			Availability:  application.Availability,
+			Education:     application.Education,
+			WorkHistory:   application.WorkHistory,
+			CreatedAt:     applicationModel.CreatedAt,
+			UpdatedAt:     applicationModel.UpdatedAt,
+		}
+
+		c.JSON(http.StatusOK, output)
 	}
 }
 
