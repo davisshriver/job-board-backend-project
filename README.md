@@ -2,7 +2,7 @@
 
 ## Description
 A Backend project that simulates a job board. Applicants can view jobs and apply to them, also includes Administrator roles that can edit postings and users.
-This project is currently in progress and should be completed soon. Come back soon to see updates and more documentation.
+This is designed for a single organization's hiring needs. I plan to scale this project to include the capabilities to add organizations and work as a 1-click apply job board.
 
 ## Table of Contents
 ### [User Endpoints](#user-endpoints)
