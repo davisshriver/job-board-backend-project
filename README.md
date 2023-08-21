@@ -901,7 +901,7 @@ Edit a job post's details. User's can only edit their own applications.
 ```
 
 <a name="delete-application"></a>
-## Delete Post: `/users/:users_id/applications/:application_id`
+## Delete Application: `/users/:users_id/applications/:application_id`
 
 Allows a user to delete their own applications.
 
