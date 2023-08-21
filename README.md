@@ -644,7 +644,285 @@ Get a specific application by application id. User's can only get their own appl
     }
 ```
 
-
 <a name="create-application"></a>
+## Create Application: `/users/:user_id/posts/:post_id/applications`
+
+Create a application for a job post. User's can only post applications for themselves.
+
+### Access Level
+`USER`
+### Method
+
+`POST`
+
+### Request Parameters
+
+#### ApplicationInput
+
+| Field          | Type      | Description                 |
+|----------------|-----------|-----------------------------|
+| `first_name`   | string    | First name of applicant     |
+| `last_name`    | string    | Last name of applicant      |
+| `email`        | string    | Email address of applicant  |
+| `phone`        | string    | Phone number of applicant   |
+| `address`      | string    | Address of applicant        |
+| `city`         | string    | City of applicant           |
+| `state`        | string    | State of applicant          |
+| `postal_code`  | string    | Postal code of applicant    |
+| `cover_letter` | string    | Cover letter of applicant   |
+| `resume_url`   | string    | URL to applicant's resume   |
+| `linkedin_url` | string    | LinkedIn profile URL        |
+| `portfolio_url`| string    | Portfolio URL of applicant  |
+| `desired_salary` | float64 | Desired salary of applicant |
+| `availability` | string    | Availability status         |
+| `education`    | array     | Educational background      |
+| `referrals`    | array     | Referral information        |
+| `work_history` | array     | Work experience details     |
+
+#### Referral
+
+| Field     | Type   | Description          |
+|-----------|--------|----------------------|
+| `name`    | string | Name of the referral |
+| `phone`   | string | Phone of the referral|
+| `relation`| string | Relation to applicant|
+| `title`   | string | Title of the referral |
+
+#### EducationInfo
+
+| Field     | Type   | Description        |
+|-----------|--------|--------------------|
+| `degree`  | string | Degree             |
+| `school`  | string | School attended    |
+| `location`| string | Location of school |
+| `grad_year`| int   | Graduation year    |
+
+#### WorkExperience
+
+| Field         | Type   | Description            |
+|---------------|--------|------------------------|
+| `position`   | string | Position               |
+| `company`    | string | Company                |
+| `location`   | string | Location               |
+| `start_year` | int    | Starting year          |
+| `end_year`   | int    | Ending year            |
+| `responsibilities`| array | Responsibilities    |
+
+**Response Body Example:**
+
+```json
+{
+    "application_id": 8,
+    "user_id": 1,
+    "post_id": 2,
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "1234567890",
+    "address": "123 Main St",
+    "city": "Example City",
+    "state": "Example State",
+    "postal_code": "12345",
+    "cover_letter": "This is my cover letter.",
+    "resume_url": "https://example.com/resume.pdf",
+    "linkedin_url": "https://linkedin.com/in/johndoe",
+    "portfolio_url": "https://johndoe.portfolio.com",
+    "referrals": [
+        {
+            "name": "Jane Smith",
+            "phone": "9876543210",
+            "relation": "Colleague",
+            "title": "Project Manager"
+        },
+        {
+            "name": "Michael Johnson",
+            "phone": "5555555555",
+            "relation": "Supervisor",
+            "title": "Lead Developer"
+        }
+    ],
+    "desired_salary": 60000,
+    "availability": "Full-time",
+    "education": [
+        {
+            "degree": "Bachelor's Degree",
+            "school": "Example University",
+            "location": "Example City",
+            "grad_year": 2020
+        }
+    ],
+    "work_history": [
+        {
+            "position": "Software Engineer",
+            "company": "Tech Company",
+            "location": "Tech City",
+            "start_year": 2020,
+            "end_year": 2022,
+            "responsibilities": [
+                "Developed web applications",
+                "Collaborated with team"
+            ]
+        }
+    ],
+    "created_at": "2023-08-21T11:29:26.3212879-05:00",
+    "expires_at": "2023-08-21T11:29:26.3212879-05:00"
+}
+```
+
 <a name="edit-application"></a>
+## Edit Application: `/users/:user_id/applications/:application:_id`
+
+Edit a job post's details. User's can only edit their own applications.
+
+### Access Level
+`USER`
+### Method
+
+`PATCH`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `post_id`      | string | post ID           |
+
+### Request Parameters
+
+#### ApplicationUpdateInput
+
+| Field          | Type      | Description                 |
+|----------------|-----------|-----------------------------|
+| `first_name`   | string    | First name of applicant     |
+| `last_name`    | string    | Last name of applicant      |
+| `email`        | string    | Email address of applicant  |
+| `phone`        | string    | Phone number of applicant   |
+| `address`      | string    | Address of applicant        |
+| `city`         | string    | City of applicant           |
+| `state`        | string    | State of applicant          |
+| `postal_code`  | string    | Postal code of applicant    |
+| `cover_letter` | string    | Cover letter of applicant   |
+| `resume_url`   | string    | URL to applicant's resume   |
+| `linkedin_url` | string    | LinkedIn profile URL        |
+| `portfolio_url`| string    | Portfolio URL of applicant  |
+| `desired_salary` | float64 | Desired salary of applicant |
+| `availability` | string    | Availability status         |
+| `education`    | array     | Educational background      |
+| `referrals`    | array     | Referral information        |
+| `work_history` | array     | Work experience details     |
+
+#### Referral
+
+| Field     | Type   | Description          |
+|-----------|--------|----------------------|
+| `name`    | string | Name of the referral |
+| `phone`   | string | Phone of the referral|
+| `relation`| string | Relation to applicant|
+| `title`   | string | Title of the referral |
+
+#### EducationInfo
+
+| Field     | Type   | Description        |
+|-----------|--------|--------------------|
+| `degree`  | string | Degree             |
+| `school`  | string | School attended    |
+| `location`| string | Location of school |
+| `grad_year`| int   | Graduation year    |
+
+#### WorkExperience
+
+| Field         | Type   | Description            |
+|---------------|--------|------------------------|
+| `position`   | string | Position               |
+| `company`    | string | Company                |
+| `location`   | string | Location               |
+| `start_year` | int    | Starting year          |
+| `end_year`   | int    | Ending year            |
+| `responsibilities`| array | Responsibilities    |
+
+**Response Body Example:**
+
+```json
+{
+    "application_id": 3,
+    "user_id": 1,
+    "post_id": 3,
+    "first_name": "Jonathan",
+    "last_name": "Doeton",
+    "email": "john.doe@example.com",
+    "phone": "1234567890",
+    "address": "123 Main St",
+    "city": "Example City",
+    "state": "Example State",
+    "postal_code": "12345",
+    "cover_letter": "This is my cover letter.",
+    "resume_url": "https://example.com/resume.pdf",
+    "linkedin_url": "https://linkedin.com/in/johndoe",
+    "portfolio_url": "https://johndoe.portfolio.com",
+    "referrals": [
+        {
+            "name": "Cool Referral 1",
+            "phone": "",
+            "relation": "",
+            "title": ""
+        },
+        {
+            "name": "Cool Referral 2",
+            "phone": "",
+            "relation": "",
+            "title": ""
+        }
+    ],
+    "desired_salary": 60000,
+    "availability": "Full-time",
+    "education": [
+        {
+            "degree": "Bachelor's Degree",
+            "school": "Example University",
+            "location": "Example City",
+            "grad_year": 2020
+        }
+    ],
+    "work_history": [
+        {
+            "position": "Software Engineer",
+            "company": "Tech Company",
+            "location": "Tech City",
+            "start_year": 2020,
+            "end_year": 2022,
+            "responsibilities": [
+                "Developed web applications",
+                "Collaborated with team"
+            ]
+        }
+    ],
+    "created_at": "2023-08-20T18:47:46.774061-05:00",
+    "expires_at": "2023-08-21T11:30:57.4266581-05:00"
+}
+```
+
 <a name="delete-application"></a>
+## Delete Post: `/users/:users_id/applications/:application_id`
+
+Allows a user to delete their own applications.
+
+### Access Level
+`USER`
+
+### Method
+
+`DELETE`
+
+### URL Parameters
+
+| Parameter | Type   | Description            |
+|-----------|--------|------------------------|
+| `post_id`      | string | Post ID           |
+| `application_id` | string | Application ID  |
+
+**Response Body Example:**
+
+```json
+{
+    "success": "Application deleted from the database"
+}
+```
