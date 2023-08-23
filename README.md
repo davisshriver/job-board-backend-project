@@ -6,7 +6,8 @@ This is designed for a single organization's hiring needs. I plan to scale this 
 
 ## Table of Contents
 ### [User Endpoints](#user-endpoints)
-- [Sign up](#create-user)
+- [Sign Up](#sign-up)
+- [Create User](#create-user)
 - [Login](#login)
 - [Get Users](#get-users)
 - [Get User](#get-user)
@@ -34,10 +35,10 @@ This is designed for a single organization's hiring needs. I plan to scale this 
 
 # User Endpoints
 <a name="user-endpoints"></a>
-<a name="create-user"></a>
+<a name="sign-up"></a>
 ## Sign Up: `/users/signup`
 
-Sign up for the job site.
+Sign up for the job site. Can only create users of type USER.
 
 ### Access Level
 `USER`
@@ -68,6 +69,42 @@ Sign up for the job site.
     "user_type": "USER"
 }
 ```
+
+<a name="create-user"></a>
+## Create User: `/users`
+
+Admin endpoint to create new users. Created user can be of type USER or ADMIN.
+
+### Access Level
+`ADMIN`
+### Method
+
+`POST`
+
+### Request Parameters
+
+| Parameter   | Type   | Description             |
+|-------------|--------|-------------------------|
+| `first_name`| string | User's first name       |
+| `last_name` | string | User's last name        |
+| `password`  | string | User's password         |
+| `email`     | string | User's email address    |
+| `phone`     | string | User's phone number     |
+| `user_type` | string | User's role (ADMIN/USER)|
+
+**Response Body Example:**
+
+```json
+{
+    "user_id": 3,
+    "first_name": "Emma",
+    "last_name": "Williams",
+    "email": "emma@example.com",
+    "phone": "555-9876",
+    "user_type": "ADMIN"
+}
+```
+
 <a name="login"></a>
 ## Login: `/users/login`
 
