@@ -60,6 +60,72 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
+		if (*user.UserType != "USER") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User type must be: USER!"})
+			return
+		}
+
+		// Check if the email or phone number already exists in the database
+		var existingUser models.User
+		err = db.Where("email = ?", *user.Email).Or("phone = ?", *user.Phone).First(&existingUser).Error
+		if err == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "The email or phone number is already being used."})
+			return
+		}
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while checking for user's email or phone number!"})
+			return
+		}
+
+		user.CreatedAt = time.Now()
+		user.UpdatedAt = time.Now()
+
+		// Hash the password
+		password := HashPassword(*user.Password)
+		user.Password = &password
+
+		err = db.Create(&user).Error
+		if err != nil {
+			msg := fmt.Sprintf("User item was not created properly!")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+
+		signUpResp := outputs.SignUpResponse{
+			UserId:    user.UserID,
+			FirstName: *user.FirstName,
+			LastName:  *user.LastName,
+			Email:     *user.Email,
+			Phone:     *user.Phone,
+			UserType:  *user.UserType,
+		}
+
+		c.JSON(http.StatusOK, signUpResp)
+	}
+}
+
+func CreateUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		err := helper.CheckUserType(c, "ADMIN")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		
+		var user models.User
+
+		err = c.BindJSON(&user)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		validationErr := validate.Struct(user)
+		if validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
+		}
+
 		// Check if the email or phone number already exists in the database
 		var existingUser models.User
 		err = db.Where("email = ?", *user.Email).Or("phone = ?", *user.Phone).First(&existingUser).Error
@@ -179,7 +245,23 @@ func GetUsers() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, allUsers)
+		// Transform models.User into UserResponse
+		var userResponses []outputs.UserResponse
+		for _, user := range allUsers {
+			userResponse := outputs.UserResponse{
+				UserID:    user.UserID,
+				FirstName: *user.FirstName,
+				LastName:  *user.LastName,
+				Email:     *user.Email,
+				Phone:     *user.Phone,
+				UserType:  *user.UserType,
+				CreatedAt: user.CreatedAt,
+				UpdatedAt: user.UpdatedAt,
+			}
+			userResponses = append(userResponses, userResponse)
+		}
+
+		c.JSON(http.StatusOK, userResponses)
 	}
 }
 
